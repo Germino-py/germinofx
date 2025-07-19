@@ -7,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { parseISO, getDay } from "date-fns"; // Importation de fonctions fiables pour les dates
 
 // Interfaces pour les données
 interface Stats {
@@ -37,7 +38,6 @@ const Analytics = () => {
       setLoadingAnalytics(true);
 
       try {
-        // CORRECTION : On sélectionne 'pnl' ET 'date'
         const { data: trades, error } = await supabase
           .from('trades')
           .select('pnl, date')
@@ -48,7 +48,6 @@ const Analytics = () => {
 
         if (error) throw error;
         
-        // Initialisation des données pour les jours de la semaine
         const weekdays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
         const initialDailyWinRate: DailyWinRate[] = weekdays.map(day => ({ name: day.substring(0, 3), "Taux de réussite": 0 }));
         
@@ -72,15 +71,13 @@ const Analytics = () => {
           const cumulativePnl = [0, ...pnlValues.map((sum => value => sum += value)(0))];
           setChartData(cumulativePnl);
           
-          // CORRECTION : Calcul du taux de réussite par jour, en gérant les fuseaux horaires
+          // CORRECTION : Calcul du taux de réussite par jour avec une méthode plus robuste
           const dailyStats: { [key: number]: { wins: number; total: number } } = { 1: { wins: 0, total: 0 }, 2: { wins: 0, total: 0 }, 3: { wins: 0, total: 0 }, 4: { wins: 0, total: 0 }, 5: { wins: 0, total: 0 } };
           trades.forEach(trade => {
-            // En séparant la date, on évite les conversions de fuseau horaire automatiques
-            const [year, month, day] = trade.date.split('-').map(Number);
-            const tradeDate = new Date(year, month - 1, day);
-            const dayOfWeek = tradeDate.getDay(); // Dimanche=0, Lundi=1...
+            const tradeDate = parseISO(trade.date); // Utilisation de parseISO pour une lecture de date fiable
+            const dayOfWeek = getDay(tradeDate);   // Utilisation de getDay (Dimanche=0, Lundi=1...)
 
-            if (dailyStats[dayOfWeek]) { // On ne traite que les jours de semaine
+            if (dailyStats[dayOfWeek]) { // On ne traite que les jours de semaine (Lundi à Vendredi)
                 dailyStats[dayOfWeek].total++;
                 if (trade.pnl > 0) {
                     dailyStats[dayOfWeek].wins++;
