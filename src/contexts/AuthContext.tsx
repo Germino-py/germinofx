@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { User as SupabaseUser, Session } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast"; // Assurez-vous d'importer useToast
 
 interface User {
   id: string;
@@ -38,17 +39,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast(); // Initialisez le hook toast
 
   useEffect(() => {
     setLoading(true);
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        if (session?.user) {
+      (event, newSession) => {
+        // MODIFICATION : Affiche un message de succès après la confirmation de l'email
+        if (event === "SIGNED_IN" && session === null) {
+          toast({
+            title: "Email confirmé !",
+            description: "Votre compte a été vérifié. Bienvenue !",
+          });
+        }
+        
+        setSession(newSession);
+        if (newSession?.user) {
           setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            name: session.user.email?.split('@')[0] || ''
+            id: newSession.user.id,
+            email: newSession.user.email || '',
+            name: newSession.user.email?.split('@')[0] || ''
           });
         } else {
           setUser(null);
@@ -60,19 +70,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => {
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [session, toast]); // Ajoutez 'session' et 'toast' aux dépendances
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return { success: false, error: error.message };
-      }
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return { success: false, error: error.message };
       return { success: true };
     } catch (error) {
       return { success: false, error: "Une erreur inattendue s'est produite" };
@@ -85,27 +88,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     try {
+      // MODIFICATION : Utilise la variable d'environnement pour l'URL de redirection
+      const redirectUrl = import.meta.env.VITE_SITE_URL;
+      if (!redirectUrl) {
+          console.error("VITE_SITE_URL n'est pas définie.");
+          return { success: false, error: "Erreur de configuration du site."};
+      }
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`
+          emailRedirectTo: redirectUrl
         }
       });
 
       if (error) {
-        // Gère l'erreur spécifique de Supabase pour un utilisateur déjà existant
         if (error.message.includes("User already registered")) {
-            return { success: false, error: "Un compte avec cette adresse e-mail existe déjà. Veuillez vous connecter ou réinitialiser votre mot de passe." };
+            return { success: false, error: "Un compte avec cette adresse e-mail existe déjà." };
         }
         return { success: false, error: error.message };
       }
       
-      // Gère le cas où la confirmation par e-mail est activée
-      if (data.user && !data.session) {
-         return { success: true };
-      }
-
       return { success: true };
     } catch (error) {
       return { success: false, error: "Une erreur inattendue s'est produite" };
@@ -114,14 +118,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`,
-      });
-
-      if (error) {
-        return { success: false, error: error.message };
-      }
-
+      // MODIFICATION : Utilise aussi la variable d'environnement ici pour la cohérence
+      const redirectUrl = `${import.meta.env.VITE_SITE_URL}/update-password`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
+      if (error) return { success: false, error: error.message };
       return { success: true };
     } catch (error) {
       return { success: false, error: "Une erreur inattendue s'est produite" };
@@ -131,11 +131,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const updatePassword = async (password: string): Promise<{ success: boolean; error?: string }> => {
     try {
         const { error } = await supabase.auth.updateUser({ password });
-
-        if (error) {
-            return { success: false, error: error.message };
-        }
-
+        if (error) return { success: false, error: error.message };
         return { success: true };
     } catch (error) {
         return { success: false, error: "Une erreur inattendue s'est produite" };
@@ -149,17 +145,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isAuthenticated = !!session;
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      login,
-      register,
-      logout,
-      sendPasswordResetEmail,
-      updatePassword,
-      isAuthenticated,
-      loading
-    }}>
+    <AuthContext.Provider value={{ user, session, login, register, logout, sendPasswordResetEmail, updatePassword, isAuthenticated, loading }}>
       {children}
     </AuthContext.Provider>
   );
