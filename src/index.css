@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* TradeCopilot Design System - Modern Trading Journal Interface */
+
+@layer base {
+  :root {
+    /* Dark gradient background inspired by the reference */
+    --background: 225 15% 15%;
+    --foreground: 220 15% 95%;
+
+    /* Card styling with subtle transparency */
+    --card: 225 20% 20%;
+    --card-foreground: 220 15% 95%;
+
+    --popover: 225 20% 20%;
+    --popover-foreground: 220 15% 95%;
+
+    /* Primary blue theme for buttons and highlights */
+    --primary: 214 95% 60%;
+    --primary-foreground: 220 15% 95%;
+    --primary-hover: 214 95% 55%;
+
+    /* Secondary styling */
+    --secondary: 225 15% 25%;
+    --secondary-foreground: 220 15% 85%;
+
+    /* Muted colors for subtle elements */
+    --muted: 225 15% 18%;
+    --muted-foreground: 220 10% 65%;
+
+    /* Accent colors */
+    --accent: 225 15% 22%;
+    --accent-foreground: 220 15% 85%;
+
+    /* Success and error states for trading */
+    --success: 145 80% 50%;
+    --success-foreground: 220 15% 95%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 220 15% 95%;
+
+    /* Input styling */
+    --input: 225 15% 12%;
+    --input-foreground: 220 15% 90%;
+    --border: 225 15% 25%;
+    --ring: 214 95% 60%;
+
+    --radius: 0.75rem;
+
+    /* Trading specific gradients and effects */
+    --gradient-primary: linear-gradient(135deg, hsl(214 95% 60%), hsl(214 95% 45%));
+    --gradient-background: linear-gradient(135deg, hsl(225 15% 15%), hsl(225 15% 12%));
+    --glass-effect: rgba(255, 255, 255, 0.05);
+    --shadow-trading: 0 10px 30px -10px hsla(214, 95%, 60%, 0.3);
+    
+    /* Animation variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Sidebar styling for trading app */
+    --sidebar-background: 225 15% 18%;
+    --sidebar-foreground: 220 15% 85%;
+    --sidebar-primary: 214 95% 60%;
+    --sidebar-primary-foreground: 220 15% 95%;
+    --sidebar-accent: 225 15% 22%;
+    --sidebar-accent-foreground: 220 15% 85%;
+    --sidebar-border: 225 15% 25%;
+    --sidebar-ring: 214 95% 60%;
+  }
+
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-background to-muted;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Custom scrollbar for modern look */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+  }
+
+  /* Glass effect utility */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Trading color utilities */
+  .profit {
+    color: hsl(var(--success));
+  }
+
+  .loss {
+    color: hsl(var(--destructive));
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
