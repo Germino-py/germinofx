@@ -136,7 +136,6 @@ export const AddTradeForm = ({ onTradeAdded }: { onTradeAdded?: () => void }) =>
               <div><Label htmlFor="trend_m15" className="text-sm">M15</Label><Select value={formData.trend_m15} onValueChange={(value) => setFormData({...formData, trend_m15: value})}><SelectTrigger className="bg-input border-border"><SelectValue placeholder="M15" /></SelectTrigger><SelectContent>{trendOptions.map((trend) => (<SelectItem key={trend.value} value={trend.value}>{trend.label}</SelectItem>))}</SelectContent></Select></div>
               <div><Label htmlFor="trend_m1" className="text-sm">M1</Label><Select value={formData.trend_m1} onValueChange={(value) => setFormData({...formData, trend_m1: value})}><SelectTrigger className="bg-input border-border"><SelectValue placeholder="M1" /></SelectTrigger><SelectContent>{trendOptions.map((trend) => (<SelectItem key={trend.value} value={trend.value}>{trend.label}</SelectItem>))}</SelectContent></Select></div>
           </div></div>
-          <div><Label htmlFor="screenshot">Capture d'écran (optionnel)</Label><div className="flex items-center gap-2"><Input id="screenshot" type="file" accept="image/*" onChange={(e) => setFormData({...formData, screenshot: e.target.files?.[0]})} className="bg-input border-border" /><Upload className="w-4 h-4 text-muted-foreground" /></div></div>
           <Button onClick={handleSubmit} disabled={isLoading} className="w-full bg-primary hover:bg-primary-hover">{isLoading ? "Enregistrement..." : "Enregistrer le Trade"}</Button>
         </div>
       </DialogContent>
