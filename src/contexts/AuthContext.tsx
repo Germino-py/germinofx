@@ -43,13 +43,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     setLoading(true);
-    
-    // On garde une trace de la session précédente pour détecter une nouvelle connexion
     let previousSession: Session | null = null;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
-        // Affiche une notification de succès après la confirmation de l'email
         if (event === "SIGNED_IN" && previousSession === null) {
           toast({
             title: "Email confirmé !",
@@ -68,8 +65,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(null);
         }
         setLoading(false);
-        
-        // Mettre à jour la session précédente
         previousSession = newSession;
       }
     );
@@ -77,7 +72,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => {
       subscription?.unsubscribe();
     };
-  }, [toast]); // Le hook ne dépend que de 'toast', qui est stable. Plus de boucle !
+  }, [toast]);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -95,18 +90,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     try {
-      const redirectUrl = import.meta.env.VITE_SITE_URL;
-      if (!redirectUrl) {
-          console.error("VITE_SITE_URL n'est pas définie dans vos variables d'environnement.");
-          return { success: false, error: "Erreur de configuration du site."};
-      }
-      
+      // Simplification : On ne spécifie plus emailRedirectTo.
+      // Supabase utilisera l'URL configurée dans le dashboard.
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
       });
 
       if (error) {
@@ -124,8 +112,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const redirectUrl = `${import.meta.env.VITE_SITE_URL}/update-password`;
-      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
+      // Simplification : Supabase utilisera l'URL du dashboard + le chemin que vous spécifiez.
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: '/update-password',
+      });
       if (error) return { success: false, error: error.message };
       return { success: true };
     } catch (error) {
