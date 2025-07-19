@@ -10,7 +10,9 @@ import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
-import { SpeedInsights } from "@vercel/speed-insights/react"; // 1. Importez SpeedInsights
+import ResetPassword from "./pages/ResetPassword";
+import UpdatePassword from "./pages/UpdatePassword";
+import { SpeedInsights } from "@vercel/speed-insights/react"; // CORRECTION ICI
 
 const queryClient = new QueryClient();
 
@@ -20,7 +22,6 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <SpeedInsights /> {/* 2. Ajoutez le composant ici */}
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -28,14 +29,15 @@ const App = () => (
             <Route path="/journal" element={<Journal />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/calendar" element={<Calendar />} />
-            {/* VOS AUTRES ROUTES VIENNENT ICI */}
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <SpeedInsights /> 
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
 
-// 3. Assurez-vous de n'avoir que cet export default
 export default App;
