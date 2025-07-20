@@ -203,3 +203,23 @@
   height: 40px;
   background-color: rgba(255, 255, 255, 0.1);
 }
+
+/* AJOUTEZ CE CODE À LA FIN DE VOTRE FICHIER CSS EXISTANT */
+
+.session-timer-glass {
+  background: rgba(28, 28, 38, 0.5); /* Verre plus sombre et semi-transparent */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Pour la compatibilité avec Safari */
+  border: 1px solid rgba(139, 92, 246, 0.2); /* Bordure violette subtile */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Effet de lueur pour l'anneau de progression */
+.timer-ring-glow {
+  filter: drop-shadow(0 0 8px var(--ring-color-glow));
+}
+
+/* Effet de lueur pour le texte du minuteur */
+.timer-text-glow {
+   text-shadow: 0 0 12px var(--ring-color-glow);
+}
