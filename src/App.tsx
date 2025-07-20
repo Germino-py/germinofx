@@ -17,8 +17,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const queryClient = new QueryClient();
 
-// On définit le groupe de routes de l'application ici, à l'extérieur du composant App.
-// C'est plus stable et c'est la bonne pratique.
+// Ce composant gère toutes les routes de l'application TradeCopilot
 const TradeCopilotApp = () => (
   <Routes>
     <Route path="/" element={<Index />} />
