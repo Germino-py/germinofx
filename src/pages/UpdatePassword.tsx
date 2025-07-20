@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,22 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 const UpdatePassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { updatePassword, session, loading } = useAuth();
+  const { updatePassword } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading) {
-      if (!session) {
-        toast({
-          title: "Session Invalide",
-          description: "Le lien de réinitialisation est peut-être invalide ou a expiré. Veuillez réessayer.",
-          variant: "destructive",
-        });
-        navigate("/reset-password");
-      }
-    }
-  }, [session, loading, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,29 +29,21 @@ const UpdatePassword = () => {
     if (success) {
       toast({
         title: "Succès",
-        description: "Votre mot de passe a été mis à jour avec succès. Vous pouvez maintenant vous connecter.",
+        description: "Votre mot de passe a été mis à jour avec succès.",
       });
-      await supabase.auth.signOut();
-      navigate("/");
+      await supabase.auth.signOut(); // On déconnecte l'utilisateur pour qu'il se reconnecte avec le nouveau mdp
+      navigate("/tradecopilot"); // On le renvoie vers la page de connexion
     } else {
       toast({
         title: "Erreur",
-        description: error || "Une erreur s'est produite lors de la mise à jour.",
+        description: error || "Impossible de mettre à jour le mot de passe.",
         variant: "destructive",
       });
     }
   };
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md glass-card border-border/20">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-3xl font-bold">
@@ -83,7 +62,6 @@ const UpdatePassword = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
                 required
               />
             </div>
@@ -94,7 +72,6 @@ const UpdatePassword = () => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
                 required
               />
             </div>
