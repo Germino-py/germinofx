@@ -111,3 +111,57 @@
   50% { transform: translate(0vw, -40vw) rotate(-60deg); }
   75% { transform: translate(-40vw, 10vw) scale(0.9) rotate(-90deg); }
 }
+
+/* AJOUTEZ CE CODE À LA FIN DE VOTRE FICHIER CSS EXISTANT */
+
+/* Ajout d'une variable de couleur RGB pour les dégradés */
+:root {
+  --primary-rgb: 54, 144, 255; /* Version RGB de votre couleur primaire */
+}
+
+/* Le conteneur principal qui définit la perspective 3D */
+.auth-page-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Empêche le débordement des éléments 3D */
+  perspective: 1000px;
+  position: relative;
+}
+
+/* Le conteneur de l'arrière-plan animé */
+.auth-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* Placé en arrière-plan */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* La grille 3D elle-même */
+.grid-container {
+  width: 200%;
+  height: 200%;
+  background-image:
+    linear-gradient(rgba(var(--primary-rgb), 0.15) 1px, transparent 1px),
+    linear-gradient(to right, rgba(var(--primary-rgb), 0.15) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+  transform-style: preserve-3d;
+  animation: rotate-grid 40s linear infinite;
+}
+
+/* L'animation de rotation de la grille */
+@keyframes rotate-grid {
+  from {
+    transform: rotateX(75deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(75deg) rotateZ(360deg);
+  }
+}
+
+/* On s'assure que les formulaires s'affichent par-dessus le fond */
+.auth-form-wrapper {
+  position: relative;
+  z-index: 1;
+}
