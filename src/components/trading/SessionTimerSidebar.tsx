@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from '@/lib/utils';
-import { Globe, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
-// Définition des sessions avec couleurs pour la lueur
+// Définition des sessions de trading
 const sessions = [
-  { name: 'London', timezone: 'Europe/London', startHour: 8, endHour: 10, color: 'text-cyan-400', ringColor: 'hsl(180, 80%, 60%)', glowColor: 'rgba(74, 222, 255, 0.5)' },
-  { name: 'New York', timezone: 'America/New_York', startHour: 9, endHour: 11, color: 'text-purple-400', ringColor: 'hsl(260, 80%, 70%)', glowColor: 'rgba(192, 132, 252, 0.5)' },
-  { name: 'Asian', timezone: 'Asia/Tokyo', startHour: 20, endHour: 22, color: 'text-red-400', ringColor: 'hsl(0, 80%, 70%)', glowColor: 'rgba(248, 113, 113, 0.5)' },
+  { name: 'London', timezone: 'Europe/London', startHour: 8, endHour: 10, color: 'text-cyan-400' },
+  { name: 'New York', timezone: 'America/New_York', startHour: 9, endHour: 11, color: 'text-cyan-400' },
+  { name: 'Asian', timezone: 'Asia/Tokyo', startHour: 20, endHour: 22, color: 'text-cyan-400' },
 ];
 
 const formatTime = (ms: number) => {
@@ -51,7 +51,6 @@ export const SessionTimerSidebar = () => {
                     name: `Session ${session.name}`,
                     message: 'Fermeture dans :',
                     countdown: formatTime(end.getTime() - nowInSessionTz.getTime()),
-                    progress: ((end.getTime() - nowInSessionTz.getTime()) / (end.getTime() - start.getTime())) * 100,
                     ...session
                 };
             }
@@ -70,44 +69,46 @@ export const SessionTimerSidebar = () => {
         upcomingSessions.sort((a, b) => a.time.getTime() - b.time.getTime());
         const nextSession = upcomingSessions[0];
         
-        const formatter = new Intl.DateTimeFormat('en-US', { timeZone: nextSession.timezone, hour12: false, weekday: 'short', hour: 'numeric', minute: 'numeric', second: 'numeric', year: 'numeric', month: 'numeric', day: 'numeric' });
         const nowInNextSessionTz = new Date(new Date().toLocaleString('en-US', { timeZone: nextSession.timezone }));
-
+        
         return {
             status: 'PRE_SESSION',
             name: `Session ${nextSession.name}`,
             message: 'Ouverture dans :',
             countdown: formatTime(nextSession.time.getTime() - nowInNextSessionTz.getTime()),
-            progress: 100,
             ...nextSession
         };
     };
     
-    const { name, message, countdown, progress, color, ringColor, glowColor } = getSessionStatus();
+    const { name, message, countdown, color } = getSessionStatus();
 
-    const Ring = ({ size, isCollapsedView = false }: { size: number, isCollapsedView?: boolean }) => (
-        <div
-            className={cn( "relative flex items-center justify-center rounded-full p-1 transition-all duration-500 timer-ring-glow")}
-            style={{ 
-                width: size, height: size,
-                backgroundImage: `
-                    radial-gradient(closest-side, ${isCollapsedView ? 'hsl(var(--sidebar-accent))' : 'transparent'} 79%, transparent 80% 100%),
-                    conic-gradient(${ringColor} ${progress}%, hsl(var(--sidebar-border)) 0)
-                `,
-                // @ts-ignore
-                '--ring-color-glow': glowColor
-             } as React.CSSProperties}
-        >
-            {isCollapsedView && <Clock className="w-4 h-4 text-sidebar-foreground" />}
+    const WateryGlassCircle = ({ size, children }: { size: string, children: React.ReactNode }) => (
+      <div 
+        className="relative rounded-full flex items-center justify-center"
+        style={{ width: size, height: size }}
+      >
+        {/* Effet de verre */}
+        <div className="absolute inset-0 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm"></div>
+        {/* Vague animée */}
+        <div className="absolute inset-0 rounded-full overflow-hidden">
+          <div className="absolute bottom-0 left-0 w-[200%] h-[200%] bg-cyan-400/20 animate-[spin_10s_linear_infinite] origin-[50%_50%] rounded-[45%]"></div>
         </div>
+        {/* Contenu */}
+        <div className="relative z-10">
+          {children}
+        </div>
+      </div>
     );
+
 
     if (isCollapsed) {
         return (
             <TooltipProvider>
                 <Tooltip delayDuration={0}>
                     <TooltipTrigger className="w-full flex justify-center py-4 border-t border-sidebar-border/50">
-                        <Ring size={32} isCollapsedView />
+                        <WateryGlassCircle size="36px">
+                            <Clock className="w-4 h-4 text-white/70" />
+                        </WateryGlassCircle>
                     </TooltipTrigger>
                     <TooltipContent side="right" className="bg-popover text-popover-foreground">
                         <p className={cn("font-semibold", color)}>{name}</p>
@@ -119,15 +120,14 @@ export const SessionTimerSidebar = () => {
     }
 
     return (
-        <div className="px-4 py-4 mt-4 rounded-lg mx-2 session-timer-glass">
-            <div className="relative flex items-center justify-center">
-                <Ring size={120} />
-                <div className="absolute flex flex-col items-center">
-                    <span style={{ '--ring-color-glow': glowColor } as React.CSSProperties} className="font-mono text-2xl font-bold text-sidebar-foreground timer-text-glow">{countdown}</span>
-                    <span className={cn("text-xs font-semibold", color)}>{name}</span>
-                </div>
-            </div>
-            <p className="text-center text-xs text-sidebar-foreground/60 mt-3">{message}</p>
+        <div className="px-4 py-4 mt-4 flex flex-col items-center text-center">
+            <WateryGlassCircle size="130px">
+              <div className="flex flex-col items-center">
+                  <span className="font-mono text-2xl font-bold text-white/90 tracking-wider">{countdown}</span>
+                  <span className={cn("text-xs font-semibold", color)}>{name}</span>
+              </div>
+            </WateryGlassCircle>
+            <p className="text-xs text-sidebar-foreground/60 mt-4">{message}</p>
         </div>
     );
 };
