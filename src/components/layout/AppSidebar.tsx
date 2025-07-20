@@ -20,8 +20,9 @@ import { SessionTimerSidebar } from "@/components/trading/SessionTimerSidebar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
+// Les liens pointent maintenant tous vers les bonnes URL sous "/tradecopilot"
 const navigationItems = [
-  { title: "Calculateur", url: "/tradecopilot/", icon: Calculator },
+  { title: "Calculateur", url: "/tradecopilot", icon: Calculator },
   { title: "Journal", url: "/tradecopilot/journal", icon: BookOpen },
   { title: "Analytics", url: "/tradecopilot/analytics", icon: BarChart3 },
   { title: "Calendrier", url: "/tradecopilot/calendar", icon: Calendar },
@@ -57,7 +58,7 @@ export function AppSidebar() {
               <NavLink
                 key={item.title}
                 to={item.url}
-                end={item.url === "/tradecopilot/"}
+                end={item.url === "/tradecopilot"} // Correction pour la route de base de l'app
                 className={({ isActive }) =>
                   cn(
                     "relative flex items-center gap-3 rounded-lg text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
