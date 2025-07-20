@@ -130,3 +130,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* AJOUTEZ CE CODE À LA FIN DE VOTRE FICHIER CSS EXISTANT */
+
+.landing-page-bg {
+  background-color: #0a0a0a;
+  background-image: 
+    linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(to right, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+}
