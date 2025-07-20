@@ -165,3 +165,41 @@
   position: relative;
   z-index: 1;
 }
+
+/* AJOUTEZ CE CODE À LA FIN DE VOTRE FICHIER CSS EXISTANT */
+
+.auth-page-container-3d {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  cursor: none; /* On cache le curseur par défaut */
+}
+
+/* Le conteneur de la scène 3D */
+.auth-background-3d {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #0a0a0a;
+}
+
+/* Le curseur personnalisé */
+.custom-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid white;
+  border-radius: 50%;
+  pointer-events: none; /* Important pour pouvoir cliquer à travers */
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s;
+  z-index: 9999;
+}
+
+.custom-cursor.hover {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
