@@ -17,12 +17,12 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const queryClient = new QueryClient();
 
-// Ce composant gère la logique de redirection
-const AppRoutes = () => {
+// Ce composant interne gère la logique de routage et peut utiliser des hooks
+const AppRouter = () => {
   const { isPasswordRecovery } = useAuth();
   const location = useLocation();
 
-  // Si on est en mode "récupération de mot de passe", on force la redirection vers la page de mise à jour
+  // Si l'utilisateur est en mode récupération de mot de passe, on le force vers la page de mise à jour
   if (isPasswordRecovery && location.pathname !== "/tradecopilot/update-password") {
     return <Navigate to="/tradecopilot/update-password" replace />;
   }
@@ -40,7 +40,7 @@ const AppRoutes = () => {
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
-}
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -49,7 +49,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppRoutes />
+          <AppRouter />
         </BrowserRouter>
         <SpeedInsights /> 
       </TooltipProvider>

@@ -29,10 +29,10 @@ const UpdatePassword = () => {
     if (success) {
       toast({
         title: "Succès",
-        description: "Votre mot de passe a été mis à jour avec succès.",
+        description: "Votre mot de passe a été mis à jour. Veuillez vous reconnecter.",
       });
-      await supabase.auth.signOut(); // On déconnecte l'utilisateur pour qu'il se reconnecte avec le nouveau mdp
-      navigate("/tradecopilot"); // On le renvoie vers la page de connexion
+      await supabase.auth.signOut();
+      navigate("/tradecopilot");
     } else {
       toast({
         title: "Erreur",
