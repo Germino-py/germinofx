@@ -94,7 +94,9 @@ const Journal = () => {
   };
   
   if (loading) { return <div className="min-h-screen flex items-center justify-center">Chargement...</div>; }
-  if (!isAuthenticated) { return <Navigate to="/" replace />; }
+  if (!isAuthenticated) {
+  return <Navigate to="/tradecopilot" replace />;
+}
 
   const renderTrend = (trend?: string) => {
     if (!trend) return <span className="text-muted-foreground">-</span>;

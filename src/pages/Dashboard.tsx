@@ -7,9 +7,8 @@ const Dashboard = () => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
+  return <Navigate to="/tradecopilot" replace />;
+}
   return (
     <AppLayout>
       <PositionCalculator />

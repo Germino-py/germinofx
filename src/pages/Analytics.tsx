@@ -118,9 +118,8 @@ const Analytics = () => {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   }
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
+    return <Navigate to="/tradecopilot" replace />;
+  } 
   return (
     <AppLayout>
       <div className="space-y-6">

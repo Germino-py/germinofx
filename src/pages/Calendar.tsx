@@ -63,12 +63,11 @@ const Calendar = () => {
         fetchTradesForMonth();
     }
   }, [user, currentDate, toast]);
-  
-
+    
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/tradecopilot" replace />;
   }
-  
+    
   const getDaysInMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   const getFirstDayOfMonth = (date: Date) => {
       const day = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
