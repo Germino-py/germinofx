@@ -12,6 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  isPasswordRecovery: boolean; // Ajout pour gérer l'état de réinitialisation
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string, confirmPassword: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
@@ -39,19 +40,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     setLoading(true);
-    let previousSession: Session | null = null;
-
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
-        if (event === "SIGNED_IN" && previousSession === null) {
-          toast({
-            title: "Email confirmé !",
-            description: "Votre compte a été vérifié. Bienvenue !",
-          });
+        if (event === "PASSWORD_RECOVERY") {
+          setIsPasswordRecovery(true);
+        } else if (event === "SIGNED_IN") {
+          setIsPasswordRecovery(false);
         }
         
         setSession(newSession);
@@ -65,14 +65,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(null);
         }
         setLoading(false);
-        previousSession = newSession;
       }
     );
 
     return () => {
       subscription?.unsubscribe();
     };
-  }, [toast]);
+  }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -88,22 +87,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (password !== confirmPassword) {
       return { success: false, error: "Les mots de passe ne correspondent pas" };
     }
-
     try {
-      // Simplification : On ne spécifie plus emailRedirectTo.
-      // Supabase utilisera l'URL configurée dans le dashboard.
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
+      const { error } = await supabase.auth.signUp({ email, password });
       if (error) {
         if (error.message.includes("User already registered")) {
             return { success: false, error: "Un compte avec cette adresse e-mail existe déjà." };
         }
         return { success: false, error: error.message };
       }
-      
       return { success: true };
     } catch (error) {
       return { success: false, error: "Une erreur inattendue s'est produite" };
@@ -112,9 +103,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Simplification : Supabase ajoutera l'URL du site automatiquement.
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: '/tradecopilot/update-password',
+        redirectTo: 'https://germinofx.vercel.app/tradecopilot/update-password',
       });
       if (error) return { success: false, error: error.message };
       return { success: true };
@@ -127,6 +117,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
         const { error } = await supabase.auth.updateUser({ password });
         if (error) return { success: false, error: error.message };
+        setIsPasswordRecovery(false); // On réinitialise l'état après la mise à jour
         return { success: true };
     } catch (error) {
         return { success: false, error: "Une erreur inattendue s'est produite" };
@@ -135,12 +126,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async (): Promise<void> => {
     await supabase.auth.signOut();
+    setIsPasswordRecovery(false); // On réinitialise aussi à la déconnexion
   };
 
   const isAuthenticated = !!session;
 
   return (
-    <AuthContext.Provider value={{ user, session, login, register, logout, sendPasswordResetEmail, updatePassword, isAuthenticated, loading }}>
+    <AuthContext.Provider value={{ user, session, isPasswordRecovery, login, register, logout, sendPasswordResetEmail, updatePassword, isAuthenticated, loading }}>
       {children}
     </AuthContext.Provider>
   );

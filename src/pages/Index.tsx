@@ -6,10 +6,9 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { PositionCalculator } from "@/components/calculator/PositionCalculator";
 import { useToast } from "@/hooks/use-toast";
 import { Scene } from "@/components/3d/Scene";
-import { Navigate } from "react-router-dom";
 
 const Index = () => {
-  const { isAuthenticated, login, register, loading, session } = useAuth();
+  const { isAuthenticated, login, register, loading } = useAuth();
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { toast } = useToast();
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -19,7 +18,6 @@ const Index = () => {
     const handleMouseOver = (e: MouseEvent) => { if ((e.target as HTMLElement).closest('button, a, input, select')) { cursorRef.current?.classList.add('hover'); } };
     const handleMouseOut = (e: MouseEvent) => { if ((e.target as HTMLElement).closest('button, a, input, select')) { cursorRef.current?.classList.remove('hover'); } };
     
-    // N'applique l'effet de curseur que si l'utilisateur n'est pas authentifié
     if (!isAuthenticated) {
       window.addEventListener('mousemove', handleMouseMove);
       document.body.addEventListener('mouseover', handleMouseOver);
@@ -57,12 +55,10 @@ const Index = () => {
     );
   }
 
-  // Si l'utilisateur est authentifié avec une session normale, affiche l'application
-  if (isAuthenticated && session?.user?.aud === 'authenticated') {
+  if (isAuthenticated) {
     return <AppLayout><PositionCalculator /></AppLayout>;
   }
 
-  // Si l'utilisateur n'est pas authentifié, affiche la page de connexion/inscription avec le fond 3D
   return (
     <div className="auth-page-container-3d">
       <div ref={cursorRef} className="custom-cursor hidden md:block"></div>
