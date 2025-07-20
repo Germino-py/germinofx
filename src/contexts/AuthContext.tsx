@@ -88,22 +88,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (password !== confirmPassword) {
       return { success: false, error: "Les mots de passe ne correspondent pas" };
     }
-
     try {
-      // Simplification : On ne spécifie plus emailRedirectTo.
-      // Supabase utilisera l'URL configurée dans le dashboard.
       const { error } = await supabase.auth.signUp({
         email,
         password,
       });
-
       if (error) {
         if (error.message.includes("User already registered")) {
             return { success: false, error: "Un compte avec cette adresse e-mail existe déjà." };
         }
         return { success: false, error: error.message };
       }
-      
       return { success: true };
     } catch (error) {
       return { success: false, error: "Une erreur inattendue s'est produite" };
@@ -112,9 +107,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   
   const sendPasswordResetEmail = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Simplification : Supabase utilisera l'URL du dashboard + le chemin que vous spécifiez.
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: '/update-password',
+        redirectTo: '/tradecopilot/update-password',
       });
       if (error) return { success: false, error: error.message };
       return { success: true };

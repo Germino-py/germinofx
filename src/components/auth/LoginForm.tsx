@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => void;
@@ -48,15 +48,12 @@ export const LoginForm = ({ onLogin, onSwitchToRegister }: LoginFormProps) => {
             </div>
             
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-foreground">Mot de passe</Label>
-                <NavLink
-                  to="/reset-password"
-                  className="text-sm text-primary hover:underline"
-                >
-                  Mot de passe oublié?
-                </NavLink>
-              </div>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-foreground">Mot de passe</Label>
+                    <Link to="/tradecopilot/reset-password" className="text-sm text-primary hover:underline">
+                        Mot de passe oublié?
+                    </Link>
+                </div>
               <div className="relative">
                 <Input
                   id="password"
