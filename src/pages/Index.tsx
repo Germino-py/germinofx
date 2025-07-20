@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react"; // 1. Importer Suspense
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
@@ -8,75 +8,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Scene } from "@/components/3d/Scene";
 
 const Index = () => {
-  const { isAuthenticated, login, register, loading } = useAuth();
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const { toast } = useToast();
-  const cursorRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (cursorRef.current) {
-        cursorRef.current.style.left = `${e.clientX}px`;
-        cursorRef.current.style.top = `${e.clientY}px`;
-      }
-    };
-    
-    const handleMouseOver = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('button, a, input')) {
-        cursorRef.current?.classList.add('hover');
-      }
-    };
-    
-    const handleMouseOut = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).closest('button, a, input')) {
-        cursorRef.current?.classList.remove('hover');
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    document.body.addEventListener('mouseover', handleMouseOver);
-    document.body.addEventListener('mouseout', handleMouseOut);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.body.removeEventListener('mouseover', handleMouseOver);
-      document.body.removeEventListener('mouseout', handleMouseOut);
-    };
-  }, []);
-
-
-  const handleLogin = async (email: string, password: string) => { /* ... (code inchangé) ... */ };
-  const handleRegister = async (email: string, password: string, confirmPassword: string) => { /* ... (code inchangé) ... */ };
-
-  if (loading) { /* ... (code inchangé) ... */ }
-  if (isAuthenticated) { return <AppLayout><PositionCalculator /></AppLayout>; }
-
-  return (
-    <div className="auth-page-container-3d">
-      <div ref={cursorRef} className="custom-cursor"></div>
-      <div className="auth-background-3d">
-        <Scene />
-      </div>
-      
-      <div className="relative z-10">
-        {isLoginMode ? (
-          <LoginForm 
-            onLogin={handleLogin}
-            onSwitchToRegister={() => setIsLoginMode(false)}
-          />
-        ) : (
-          <RegisterForm 
-            onRegister={handleRegister}
-            onSwitchToLogin={() => setIsLoginMode(true)}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-
-// COPIEZ VOS FONCTIONS handleLogin, handleRegister et le rendu de chargement ici
-const FullIndex = () => {
   const { isAuthenticated, login, register, loading } = useAuth();
   const [isLoginMode, setIsLoginMode] = useState(true);
   const { toast } = useToast();
@@ -124,7 +55,10 @@ const FullIndex = () => {
     <div className="auth-page-container-3d">
       <div ref={cursorRef} className="custom-cursor hidden md:block"></div>
       <div className="auth-background-3d">
-        <Scene />
+        {/* 2. Entourer la scène 3D avec Suspense */}
+        <Suspense fallback={null}>
+          <Scene />
+        </Suspense>
       </div>
       <div className="relative z-10">
         {isLoginMode ? <LoginForm onLogin={handleLogin} onSwitchToRegister={() => setIsLoginMode(false)} /> : <RegisterForm onRegister={handleRegister} onSwitchToLogin={() => setIsLoginMode(true)} />}
@@ -133,5 +67,4 @@ const FullIndex = () => {
   );
 };
 
-
-export default FullIndex;
+export default Index;
