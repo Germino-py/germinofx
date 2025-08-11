@@ -86,7 +86,7 @@ export const LandingPage = () => {
           <footer id="contact" className="text-center py-16 text-neutral-500">
               <h3 className="text-3xl font-bold text-white mb-4">Contact</h3>
               <p className="text-neutral-300">N'hésitez pas à me contacter.</p>
-              <a href="mailto:votre.email@example.com" className="text-lg text-purple-400 hover:underline mt-2 inline-block">votre.email@example.com</a>
+              <a href="mailto:votre.email@example.com" className="text-lg text-purple-400 hover:underline mt-2 inline-block">germain.hounsouke@gmail.com</a>
           </footer>
 
         </div>
